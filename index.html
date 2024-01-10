@@ -2,10 +2,13 @@
 <html>
 <head>
     <title>JSON Beautifier</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" 
+        
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    
     <style>
         body {
             margin: 0;
@@ -32,7 +35,7 @@
         }
         #copyButton {
             position: absolute;
-            top: 40px;
+            top: 50px;
             right: 10px;
             background-color: transparent;
             border: none;
@@ -43,11 +46,12 @@
 </head>
 <body>
     <button id="beautifyButton" onclick="beautifyJSON()" disabled>Beautify JSON</button>
-    <div id="editor"></div>
-    <button id="copyButton" onclick="copyToClipboard()"><i class="far fa-copy"></i></button>
 
+    <textarea id="editor"></textarea>
+    <button id="copyButton" onclick="copyToClipboard()"><i class="far fa-copy"></i></button>
+    
     <script>
-        var editor = CodeMirror(document.getElementById('editor'), {
+        var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
             lineNumbers: true,
             mode: 'application/json',
             gutters: ['CodeMirror-lint-markers'],
@@ -56,14 +60,29 @@
 
         function validateJSON() {
             var beautifyButton = document.getElementById('beautifyButton');
-            try {
-                JSON.parse(editor.getValue());
-                beautifyButton.disabled = false;
-            } catch (e) {
-                beautifyButton.disabled = true;
+            var copyButton = document.getElementById('copyButton');
+            if(editor.getValue().length>0){
+           	  copyButton.disabled = false;
+              try {
+                  JSON.parse(editor.getValue());
+                  beautifyButton.innerHTML="Beautify - Valid JSON ✅";
+                  beautifyButton.disabled = false;
+                  
+
+              } catch (e) {
+                  beautifyButton.innerHTML="Beautify - Invalid JSON ❌";
+                  beautifyButton.disabled = true;
+                  
+              }
+            }else{
+            	copyButton.disabled = true;
             }
         }
 
+        function beautifyJSON() {
+            var parsedJSON = JSON.parse(editor.getValue());
+            editor.setValue(JSON.stringify(parsedJSON, null, 4));
+        }
         function beautifyJSON() {
             var parsedJSON = JSON.parse(editor.getValue());
             editor.setValue(JSON.stringify(parsedJSON, null, 4));
@@ -82,9 +101,10 @@
                 alert('Error in copying text: ', err);
             });
         }
-
+        
         editor.on('change', function() {
             validateJSON();
+            
         });
     </script>
 </body>
